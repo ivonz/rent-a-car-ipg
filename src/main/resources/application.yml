@@ -43,4 +43,8 @@ spring:
   #api-key:
   #api-secret:
   #cloud-name:
-
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.jdbc.bind: TRACE
+    org.springframework.security: TRACE
