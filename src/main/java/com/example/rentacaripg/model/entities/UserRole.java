@@ -5,7 +5,11 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "roles")
-public class UserRole extends BaseEntity{
+public class UserRole{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     private UserRoleEnum role;

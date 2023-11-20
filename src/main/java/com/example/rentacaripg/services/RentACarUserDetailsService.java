@@ -1,7 +1,10 @@
 package com.example.rentacaripg.services;
 
 import com.example.rentacaripg.model.entities.User;
+import com.example.rentacaripg.model.entities.UserRole;
 import com.example.rentacaripg.repositories.UserRepository;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,16 +23,21 @@ public class RentACarUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         return userRepository.findByEmail(email)
-                .map(this::map)
+                .map(RentACarUserDetailsService::map)
                 .orElseThrow(() -> new UsernameNotFoundException("User " + email + " not found!"));
     }
 
-    private UserDetails map(User userEntity) {
+    private static UserDetails map(User userEntity) {
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(userEntity.getEmail())
                 .password(userEntity.getPassword())
-                .authorities(List.of()) //TODO - add roles
+                .authorities(userEntity.getRoles().stream().map(RentACarUserDetailsService::map).toList())
                 .build();
+    }
+
+    private static GrantedAuthority map(UserRole userRole) {
+        return new SimpleGrantedAuthority(
+                "ROLE_" + userRole.getRole().name());
     }
 }

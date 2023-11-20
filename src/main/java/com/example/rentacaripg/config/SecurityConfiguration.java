@@ -1,5 +1,6 @@
 package com.example.rentacaripg.config;
 
+import com.example.rentacaripg.model.enums.UserRoleEnum;
 import com.example.rentacaripg.repositories.UserRepository;
 import com.example.rentacaripg.services.RentACarUserDetailsService;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -23,6 +24,7 @@ public class SecurityConfiguration {
                     .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                     // Allow anyone to see the home page, the registration page and the login form
                     .requestMatchers("/", "/users/login", "/users/register", "/users/login-error").permitAll()
+                    .requestMatchers("/admin").hasRole(UserRoleEnum.ADMIN.name())
                     // All other requests are authenticated
                     .anyRequest().authenticated()
         ).formLogin(
