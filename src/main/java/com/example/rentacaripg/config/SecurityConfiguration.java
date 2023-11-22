@@ -3,6 +3,7 @@ package com.example.rentacaripg.config;
 import com.example.rentacaripg.model.enums.UserRoleEnum;
 import com.example.rentacaripg.repositories.UserRepository;
 import com.example.rentacaripg.services.RentACarUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +16,15 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfiguration {
 
+    private final String rememberMeKey;
+
+    public SecurityConfiguration(@Value("$remember.me.key") String rememberMeKey) {
+        this.rememberMeKey = rememberMeKey;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(
+        return httpSecurity.authorizeHttpRequests(
             //Define which urls are visible by users
             authorizeRequests -> authorizeRequests
                     // All static resources which are situated in js, images, css are available for anyone
@@ -45,11 +52,15 @@ public class SecurityConfiguration {
                         .logoutSuccessUrl("/")
                         //invalidate the HTTP session
                         .invalidateHttpSession(true)
-        );
-
-        //TODO: remember me.
-
-        return httpSecurity.build();
+        ).rememberMe(
+                rememberMe -> {
+                    rememberMe.key(rememberMeKey)
+                            //name param from auth-login checkbox
+                            .rememberMeParameter("rememberme")
+                            .rememberMeCookieName("rememberme")
+                            .tokenValiditySeconds(60);
+                }
+        ).build();
     }
 
     @Bean
